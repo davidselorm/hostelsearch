@@ -4,7 +4,7 @@ import { Campus, GooglePlaceResult, Hostel, RoomOption, ReviewItem } from '../ty
  * Calculates Haversine distance between two coordinates in Kilometers
  */
 export function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in km
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =
@@ -15,62 +15,8 @@ export function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lo
   return parseFloat((R * c).toFixed(2));
 }
 
-/**
- * Estimates walking time in minutes based on distance
- */
 export function estimateWalkTime(distanceKm: number): number {
-  // Average student walking speed: 4.8 km/h -> 1 km ≈ 12.5 mins
   return Math.max(2, Math.round(distanceKm * 12.5));
-}
-
-/**
- * Default realistic student room pricing generator based on campus location and ratings
- */
-function generateDefaultRoomOptions(baseRating: number = 4.0): RoomOption[] {
-  const multiplier = baseRating >= 4.5 ? 1.25 : baseRating >= 4.0 ? 1.0 : 0.85;
-
-  return [
-    {
-      type: '1-in-a-room',
-      title: 'Single Executive (Ensuite)',
-      pricePerSemester: Math.round(4500 * multiplier),
-      pricePerAcademicYear: Math.round(8500 * multiplier),
-      available: true,
-      withAc: true,
-      withBathroom: true,
-      description: 'Private self-contained single room with study desk and personal wardrobe.'
-    },
-    {
-      type: '2-in-a-room',
-      title: '2-in-a-Room Standard',
-      pricePerSemester: Math.round(3200 * multiplier),
-      pricePerAcademicYear: Math.round(6000 * multiplier),
-      available: true,
-      withAc: true,
-      withBathroom: true,
-      description: 'Shared room for two students with matching study tables.'
-    },
-    {
-      type: '3-in-a-room',
-      title: '3-in-a-Room Economy',
-      pricePerSemester: Math.round(2400 * multiplier),
-      pricePerAcademicYear: Math.round(4500 * multiplier),
-      available: true,
-      withAc: false,
-      withBathroom: true,
-      description: 'Spacious 3-person room with ceiling fans and individual wardrobes.'
-    },
-    {
-      type: '4-in-a-room',
-      title: '4-in-a-Room Budget',
-      pricePerSemester: Math.round(1900 * multiplier),
-      pricePerAcademicYear: Math.round(3600 * multiplier),
-      available: true,
-      withAc: false,
-      withBathroom: true,
-      description: 'Most economical option with shared ensuite bathroom.'
-    }
-  ];
 }
 
 const STOCK_HOSTEL_PHOTOS = [
@@ -90,33 +36,20 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
   const lng = place.location?.longitude || campus.center.lng + (Math.random() - 0.5) * 0.02;
   const distanceKm = calculateDistanceKm(campus.center.lat, campus.center.lng, lat, lng);
   const walkTimeMins = estimateWalkTime(distanceKm);
-  const rating = place.rating || 4.2;
-  const rooms = generateDefaultRoomOptions(rating);
+  const rating = place.rating || 4.0;
 
-  const phone = place.nationalPhoneNumber || '+233 24 000 0000';
+  const phone = place.nationalPhoneNumber || '';
   const cleanPhone = phone.replace(/[^\d+]/g, '');
 
   const reviews: ReviewItem[] = (place.reviews || []).map((rev, index) => ({
     id: `g-rev-${place.id}-${index}`,
-    authorName: rev.authorAttribution?.displayName || `Verified Student ${index + 1}`,
+    authorName: rev.authorAttribution?.displayName || 'Google Reviewer',
     rating: rev.rating || 5,
-    relativeTimeDescription: rev.relativePublishTimeDescription || 'Recently on Google',
-    text: rev.text?.text || 'Great environment with consistent water and power.',
+    relativeTimeDescription: rev.relativePublishTimeDescription || 'On Google Maps',
+    text: rev.text?.text || '',
     profilePhotoUri: rev.authorAttribution?.photoUri
-  }));
+  })).filter(r => r.text.length > 0);
 
-  // If no reviews in payload, create friendly defaults
-  if (reviews.length === 0) {
-    reviews.push({
-      id: `rev-default-${place.id}`,
-      authorName: 'Verified Google Reviewer',
-      rating: rating,
-      relativeTimeDescription: 'Google Maps Verified',
-      text: `Clean and well-managed hostel located near ${campus.shortName}. Very convenient for commuting.`
-    });
-  }
-
-  // Shuffle stock photos for variety
   const photos = [
     STOCK_HOSTEL_PHOTOS[Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length)],
     STOCK_HOSTEL_PHOTOS[(Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length) + 1) % STOCK_HOSTEL_PHOTOS.length]
@@ -125,7 +58,6 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
   return {
     id: `gmaps-${place.id || Math.random().toString(36).substring(2, 9)}`,
     name: place.displayName?.text || 'Student Hostel',
-    tagline: `Verified Google Maps hostel near ${campus.shortName}`,
     campusId: campus.id === 'all' ? 'ug-legon' : campus.id,
     campusName: campus.name,
     address: place.formattedAddress || `${campus.city}, Ghana`,
@@ -135,22 +67,38 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
     distanceKm,
     walkTimeMins,
     rating,
-    reviewCount: place.userRatingCount || Math.floor(Math.random() * 80) + 15,
-    priceMin: rooms[rooms.length - 1].pricePerSemester,
-    priceMax: rooms[0].pricePerAcademicYear,
+    reviewCount: place.userRatingCount || 0,
+    priceMin: 3000,
+    priceMax: 7500,
     currency: 'GHS',
-    rooms,
+    rooms: [
+      {
+        type: '1-in-a-room',
+        title: 'Single Room',
+        pricePerSemester: 5000,
+        pricePerAcademicYear: 9000,
+        available: true,
+        withAc: true,
+        withBathroom: true
+      },
+      {
+        type: '2-in-a-room',
+        title: '2 in a Room',
+        pricePerSemester: 3500,
+        pricePerAcademicYear: 6500,
+        available: true,
+        withAc: true,
+        withBathroom: true
+      }
+    ],
     amenities: [
-      'Standby Generator (No Dumsor)',
-      'Water Reservoir Storage Tank',
-      'Campus WiFi',
-      '24/7 Security & CCTV',
-      'Study Room',
-      'Communal Kitchenette'
+      'Standby Generator',
+      'Water Reservoir',
+      'Security'
     ],
     photos,
     phoneNumber: phone,
-    whatsappNumber: cleanPhone.startsWith('+') ? cleanPhone : `+233${cleanPhone.replace(/^0/, '')}`,
+    whatsappNumber: cleanPhone.startsWith('+') ? cleanPhone : cleanPhone ? `+233${cleanPhone.replace(/^0/, '')}` : '',
     website: place.websiteUri,
     googleMapsUrl: place.googleMapsUri || `https://maps.google.com/?q=${encodeURIComponent(place.displayName?.text || 'hostel')}+${encodeURIComponent(campus.city)}`,
     googlePlaceId: place.id,
@@ -179,7 +127,7 @@ export async function searchGooglePlaces(apiKey: string, query: string, campus: 
 
   const body = {
     textQuery: query,
-    pageSize: 15,
+    pageSize: 20,
     locationBias: {
       circle: {
         center: {
@@ -208,20 +156,19 @@ export async function searchGooglePlaces(apiKey: string, query: string, campus: 
 }
 
 /**
- * Fallback live OpenStreetMap / Overpass scraper for student hostels in Ghana
- * Runs without requiring a paid Google API key!
+ * Live OpenStreetMap / Overpass query for real hostels
  */
 export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]> {
   const lat = campus.center.lat;
   const lng = campus.center.lng;
-  const delta = (campus.radiusKm / 111) * 1.2; // approx bbox
+  const delta = (campus.radiusKm / 111) * 1.2;
   const south = lat - delta;
   const west = lng - delta;
   const north = lat + delta;
   const east = lng + delta;
 
   const overpassQuery = `
-    [out:json][timeout:25];
+    [out:json][timeout:20];
     (
       node(${south.toFixed(4)},${west.toFixed(4)},${north.toFixed(4)},${east.toFixed(4)})["tourism"="hostel"];
       node(${south.toFixed(4)},${west.toFixed(4)},${north.toFixed(4)},${east.toFixed(4)})["building"="hostel"];
@@ -229,7 +176,7 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
       way(${south.toFixed(4)},${west.toFixed(4)},${north.toFixed(4)},${east.toFixed(4)})["tourism"="hostel"];
       way(${south.toFixed(4)},${west.toFixed(4)},${north.toFixed(4)},${east.toFixed(4)})["building"="hostel"];
     );
-    out body 25 center;
+    out body 30 center;
   `;
 
   const response = await fetch('https://overpass-api.de/api/interpreter', {
@@ -241,7 +188,7 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
   });
 
   if (!response.ok) {
-    throw new Error(`OpenStreetMap Overpass API responded with HTTP ${response.status}`);
+    throw new Error(`Spatial API HTTP ${response.status}`);
   }
 
   const data = await response.json();
@@ -253,14 +200,12 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
     const itemLng = el.lon || el.center?.lon || lng;
     const distanceKm = calculateDistanceKm(lat, lng, itemLat, itemLng);
     const walkTimeMins = estimateWalkTime(distanceKm);
-    const phone = el.tags.phone || el.tags['contact:phone'] || el.tags['contact:mobile'] || '+233 24 100 2030';
+    const phone = el.tags.phone || el.tags['contact:phone'] || el.tags['contact:mobile'] || '';
     const cleanPhone = phone.replace(/[^\d+]/g, '');
-    const rooms = generateDefaultRoomOptions(4.3);
 
     return {
       id: `osm-${el.id}`,
       name: name.includes('Hostel') ? name : `${name} Hostel`,
-      tagline: `Student residence near ${campus.shortName}`,
       campusId: campus.id === 'all' ? 'ug-legon' : campus.id,
       campusName: campus.name,
       address: el.tags['addr:street'] || el.tags['addr:suburb'] || `${campus.popularAreas[0] || campus.city}, Ghana`,
@@ -269,26 +214,41 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
       longitude: itemLng,
       distanceKm,
       walkTimeMins,
-      rating: 4.3,
-      reviewCount: Math.floor(Math.random() * 70) + 12,
-      priceMin: rooms[rooms.length - 1].pricePerSemester,
-      priceMax: rooms[0].pricePerAcademicYear,
+      rating: 4.2,
+      reviewCount: 0,
+      priceMin: 3200,
+      priceMax: 7000,
       currency: 'GHS',
-      rooms,
+      rooms: [
+        {
+          type: '1-in-a-room',
+          title: 'Single Room',
+          pricePerSemester: 4800,
+          pricePerAcademicYear: 8800,
+          available: true,
+          withAc: true,
+          withBathroom: true
+        },
+        {
+          type: '2-in-a-room',
+          title: '2 in a Room',
+          pricePerSemester: 3400,
+          pricePerAcademicYear: 6200,
+          available: true,
+          withAc: false,
+          withBathroom: true
+        }
+      ],
       amenities: [
-        'Standby Power Generator (Dumsor Proof)',
-        'Constant Water Reserve (Polytanks)',
-        'WiFi Connectivity',
-        '24/7 Security Patrol',
-        'Study Space',
-        'Communal Kitchen'
+        'Standby Generator',
+        'Water Reservoir'
       ],
       photos: [
         STOCK_HOSTEL_PHOTOS[Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length)],
         STOCK_HOSTEL_PHOTOS[(Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length) + 1) % STOCK_HOSTEL_PHOTOS.length]
       ],
       phoneNumber: phone,
-      whatsappNumber: cleanPhone.startsWith('+') ? cleanPhone : `+233${cleanPhone.replace(/^0/, '')}`,
+      whatsappNumber: cleanPhone.startsWith('+') ? cleanPhone : cleanPhone ? `+233${cleanPhone.replace(/^0/, '')}` : '',
       website: el.tags.website || el.tags['contact:website'],
       googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}+${encodeURIComponent(campus.city)}`,
       verified: true,
@@ -299,15 +259,24 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
       hasFreeWifi: true,
       lastUpdated: new Date().toISOString(),
       source: 'google_maps',
-      reviews: [
-        {
-          id: `rev-${el.id}`,
-          authorName: 'Verified Student Resident',
-          rating: 4.5,
-          relativeTimeDescription: 'Recent',
-          text: `Located nicely with fast access to campus. Reliable water and electricity.`
-        }
-      ]
+      reviews: []
     };
   });
+}
+
+/**
+ * Automatic background sync: checks environment variable or OSM
+ */
+export async function autoFetchHostels(campus: Campus): Promise<Hostel[]> {
+  const envKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY;
+  if (envKey && typeof envKey === 'string' && envKey.trim().length > 10) {
+    try {
+      return await searchGooglePlaces(envKey.trim(), `hostels near ${campus.name}`, campus);
+    } catch (e) {
+      console.warn('Google Places API key failed, falling back to spatial engine:', e);
+    }
+  }
+
+  // Fallback to spatial engine
+  return await fetchLiveHostelsFromOSM(campus);
 }

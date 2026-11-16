@@ -1,6 +1,6 @@
 import React from 'react';
-import { Filter, RotateCcw, DollarSign, Bed, Users, Star, Compass, Zap, Droplets, Wifi, Bus, ShieldCheck } from 'lucide-react';
-import { FilterState, RoomCapacityType, GenderPolicy } from '../types/hostel';
+import { Filter, RotateCcw, DollarSign, Bed, Compass, Star, Zap, Droplets, Wifi, Bus, ShieldCheck } from 'lucide-react';
+import { FilterState, RoomCapacityType } from '../types/hostel';
 
 interface FilterSidebarProps {
   filters: FilterState;
@@ -16,18 +16,18 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   matchingCount
 }) => {
   const roomTypeOptions: { id: RoomCapacityType; label: string }[] = [
-    { id: '1-in-a-room', label: '1-in-a-Room (Single)' },
-    { id: '2-in-a-room', label: '2-in-a-Room (Double)' },
-    { id: '3-in-a-room', label: '3-in-a-Room (Triple)' },
-    { id: '4-in-a-room', label: '4-in-a-Room (Quad)' }
+    { id: '1-in-a-room', label: '1 in a Room' },
+    { id: '2-in-a-room', label: '2 in a Room' },
+    { id: '3-in-a-room', label: '3 in a Room' },
+    { id: '4-in-a-room', label: '4 in a Room' }
   ];
 
   const amenityOptions = [
     { id: 'generator', label: 'Standby Generator', icon: Zap },
-    { id: 'water', label: 'Water Reservoir Tank', icon: Droplets },
-    { id: 'wifi', label: 'High-Speed WiFi', icon: Wifi },
-    { id: 'shuttle', label: 'Free Campus Shuttle', icon: Bus },
-    { id: 'security', label: '24/7 Security & CCTV', icon: ShieldCheck }
+    { id: 'water', label: 'Water Reservoir', icon: Droplets },
+    { id: 'wifi', label: 'WiFi', icon: Wifi },
+    { id: 'shuttle', label: 'Campus Shuttle', icon: Bus },
+    { id: 'security', label: '24/7 Security', icon: ShieldCheck }
   ];
 
   const toggleRoomType = (type: RoomCapacityType) => {
@@ -47,53 +47,47 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm sticky top-24 space-y-6">
+    <div className="bg-white rounded-2xl p-4 border border-slate-200 sticky top-20 space-y-5">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
-            <Filter className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900">Filter Hostels</h3>
-            <p className="text-xs text-slate-500">{matchingCount} matching results</p>
-          </div>
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="flex items-center gap-1.5">
+          <Filter className="w-4 h-4 text-brand-600" />
+          <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Filters ({matchingCount})</span>
         </div>
         <button
           onClick={onReset}
-          className="text-xs font-semibold text-slate-500 hover:text-brand-600 flex items-center gap-1 transition-colors"
-          title="Reset all filters"
+          className="text-xs text-slate-400 hover:text-brand-600 flex items-center gap-1"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-3 h-3" />
           <span>Reset</span>
         </button>
       </div>
 
-      {/* Sort By */}
+      {/* Sort */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-          Sort Results By
+        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+          Sort By
         </label>
         <select
           value={filters.sortBy}
           onChange={(e) => onChange({ sortBy: e.target.value as any })}
-          className="w-full text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-slate-800 focus:outline-none"
         >
-          <option value="recommended">⭐ Highest Rated First</option>
-          <option value="price_asc">💵 Price: Lowest to Highest</option>
-          <option value="price_desc">💎 Price: Highest to Lowest</option>
-          <option value="distance">🚶 Closest to Campus Gate</option>
+          <option value="recommended">Highest Rating</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="distance">Nearest to Campus</option>
         </select>
       </div>
 
-      {/* Max Budget Slider */}
+      {/* Max Budget */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5 text-brand-600" /> Max Budget / Sem
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+            Max Price / Sem
           </label>
-          <span className="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded-lg border border-brand-100">
+          <span className="text-xs font-bold text-brand-600">
             GHS {filters.maxPrice.toLocaleString()}
           </span>
         </div>
@@ -104,97 +98,40 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           step="500"
           value={filters.maxPrice}
           onChange={(e) => onChange({ maxPrice: Number(e.target.value) })}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
+          className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
         />
-        <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-medium">
-          <span>GHS 2,000</span>
-          <span>GHS 7,000</span>
-          <span>GHS 12,000+</span>
-        </div>
       </div>
 
       {/* Room Types */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-          <Bed className="w-3.5 h-3.5 text-brand-600" /> Room Capacity
+        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">
+          Room Capacity
         </label>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {roomTypeOptions.map(room => {
             const checked = filters.roomTypes.includes(room.id);
             return (
               <label
                 key={room.id}
-                className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-all border ${
-                  checked ? 'bg-brand-50/70 border-brand-300 text-brand-900 font-semibold' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                }`}
+                className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer"
               >
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={() => toggleRoomType(room.id)}
-                    className="rounded text-brand-600 focus:ring-brand-500 w-3.5 h-3.5"
-                  />
-                  <span>{room.label}</span>
-                </div>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleRoomType(room.id)}
+                  className="rounded text-brand-600 w-3.5 h-3.5"
+                />
+                <span>{room.label}</span>
               </label>
             );
           })}
         </div>
       </div>
 
-      {/* Distance to Campus */}
+      {/* Amenities */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-brand-600" /> Max Distance
-          </label>
-          <span className="text-xs font-bold text-slate-700">
-            {filters.maxDistanceKm >= 10 ? 'Any distance' : `< ${filters.maxDistanceKm} km`}
-          </span>
-        </div>
-        <input
-          type="range"
-          min="0.5"
-          max="10"
-          step="0.5"
-          value={filters.maxDistanceKm}
-          onChange={(e) => onChange({ maxDistanceKm: Number(e.target.value) })}
-          className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand-600"
-        />
-        <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-          <span>0.5 km (Walk)</span>
-          <span>3 km</span>
-          <span>10 km+</span>
-        </div>
-      </div>
-
-      {/* Gender Policy */}
-      <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Users className="w-3.5 h-3.5 text-brand-600" /> Gender Policy
-        </label>
-        <div className="grid grid-cols-3 gap-1.5">
-          {(['all', 'Co-ed', 'Female Only', 'Male Only'] as const).map(option => (
-            <button
-              key={option}
-              onClick={() => onChange({ gender: option })}
-              className={`py-1.5 px-2 text-center rounded-lg text-xs font-semibold transition-all border ${
-                filters.gender === option
-                  ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {option === 'all' ? 'All' : option}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Critical Ghanaian Amenities */}
-      <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">
-          Essential Student Amenities
+        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">
+          Amenities
         </label>
         <div className="space-y-1.5">
           {amenityOptions.map(am => {
@@ -203,17 +140,15 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             return (
               <label
                 key={am.id}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-all border ${
-                  checked ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-semibold' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                }`}
+                className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer"
               >
                 <input
                   type="checkbox"
                   checked={checked}
                   onChange={() => toggleAmenity(am.id)}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5"
+                  className="rounded text-brand-600 w-3.5 h-3.5"
                 />
-                <Icon className={`w-3.5 h-3.5 ${checked ? 'text-emerald-600' : 'text-slate-400'}`} />
+                <Icon className="w-3.5 h-3.5 text-slate-400" />
                 <span>{am.label}</span>
               </label>
             );
@@ -221,23 +156,23 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </div>
 
-      {/* Minimum Rating */}
+      {/* Rating */}
       <div>
-        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> Google Rating
+        <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+          Min Rating
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           {[0, 4.0, 4.5].map(rating => (
             <button
               key={rating}
               onClick={() => onChange({ minRating: rating })}
-              className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+              className={`flex-1 py-1 rounded-lg text-xs font-bold border ${
                 filters.minRating === rating
-                  ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-sm'
+                  ? 'bg-slate-900 text-white border-slate-900'
                   : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              {rating === 0 ? 'Any' : `${rating}+ ★`}
+              {rating === 0 ? 'All' : `${rating}+`}
             </button>
           ))}
         </div>
