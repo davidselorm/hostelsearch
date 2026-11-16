@@ -1,8 +1,5 @@
 import { Campus, GooglePlaceResult, Hostel, RoomOption, ReviewItem } from '../types/hostel';
 
-/**
- * Calculates Haversine distance between two coordinates in Kilometers
- */
 export function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -19,19 +16,21 @@ export function estimateWalkTime(distanceKm: number): number {
   return Math.max(2, Math.round(distanceKm * 12.5));
 }
 
-const STOCK_HOSTEL_PHOTOS = [
-  'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&auto=format&fit=crop&q=80'
+const REAL_CAMPUS_HOSTEL_PHOTOS = [
+  'https://upload.wikimedia.org/wikipedia/commons/4/46/CHANCELLOR%27S_HALL_%28GUSSS_HOSTELS%29%2C_KNUST.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/f/f3/SRC_hostel_-_KNUST.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/7/70/Jubilee_Hall%2C_University_of_Ghana.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/3/38/SPRING_HOSTEL_IN_KNUST.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/f/f5/University_of_Ghana_-_Legon_Hall_2.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/1/1c/S-Block_%28Legon_hall%29_-_panoramio.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/0/07/Entrance_to_Commonwealth_Hall_Legon_1.jpg',
+  'https://upload.wikimedia.org/wikipedia/commons/d/df/Gurene_Wikimedia_Community_Meetup%2C_University_of_Cape_Coast_-_18th_September%2C_2021_-_13.jpg'
 ];
 
 /**
  * Transforms Google Places API (New) result into our standard Hostel model
  */
-export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: Campus): Hostel {
+export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: Campus, apiKey?: string): Hostel {
   const lat = place.location?.latitude || campus.center.lat + (Math.random() - 0.5) * 0.02;
   const lng = place.location?.longitude || campus.center.lng + (Math.random() - 0.5) * 0.02;
   const distanceKm = calculateDistanceKm(campus.center.lat, campus.center.lng, lat, lng);
@@ -50,10 +49,21 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
     profilePhotoUri: rev.authorAttribution?.photoUri
   })).filter(r => r.text.length > 0);
 
-  const photos = [
-    STOCK_HOSTEL_PHOTOS[Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length)],
-    STOCK_HOSTEL_PHOTOS[(Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length) + 1) % STOCK_HOSTEL_PHOTOS.length]
-  ];
+  // If Google Places has photos, use Google's photo endpoint; otherwise use real campus hostel photos
+  let photos: string[] = [];
+  if (place.photos && place.photos.length > 0 && apiKey) {
+    photos = place.photos.slice(0, 3).map(p => 
+      `https://places.googleapis.com/v1/${p.name}/media?maxHeightPx=800&maxWidthPx=1200&key=${apiKey}`
+    );
+  }
+
+  if (photos.length === 0) {
+    const hash = Math.abs(place.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0));
+    photos = [
+      REAL_CAMPUS_HOSTEL_PHOTOS[hash % REAL_CAMPUS_HOSTEL_PHOTOS.length],
+      REAL_CAMPUS_HOSTEL_PHOTOS[(hash + 1) % REAL_CAMPUS_HOSTEL_PHOTOS.length]
+    ];
+  }
 
   return {
     id: `gmaps-${place.id || Math.random().toString(36).substring(2, 9)}`,
@@ -68,8 +78,8 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
     walkTimeMins,
     rating,
     reviewCount: place.userRatingCount || 0,
-    priceMin: 3000,
-    priceMax: 7500,
+    priceMin: 3200,
+    priceMax: 7800,
     currency: 'GHS',
     rooms: [
       {
@@ -94,7 +104,7 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
     amenities: [
       'Standby Generator',
       'Water Reservoir',
-      'Security'
+      '24/7 Security'
     ],
     photos,
     phoneNumber: phone,
@@ -114,15 +124,12 @@ export function transformGooglePlaceToHostel(place: GooglePlaceResult, campus: C
   };
 }
 
-/**
- * Searches Google Places API (New) via REST
- */
 export async function searchGooglePlaces(apiKey: string, query: string, campus: Campus): Promise<Hostel[]> {
   const url = 'https://places.googleapis.com/v1/places:searchText';
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-Goog-Api-Key': apiKey,
-    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.photos,places.reviews'
+    'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.photos'
   };
 
   const body = {
@@ -152,12 +159,9 @@ export async function searchGooglePlaces(apiKey: string, query: string, campus: 
 
   const data = await res.json();
   const places: GooglePlaceResult[] = data.places || [];
-  return places.map(p => transformGooglePlaceToHostel(p, campus));
+  return places.map(p => transformGooglePlaceToHostel(p, campus, apiKey));
 }
 
-/**
- * Live OpenStreetMap / Overpass query for real hostels
- */
 export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]> {
   const lat = campus.center.lat;
   const lng = campus.center.lng;
@@ -203,6 +207,8 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
     const phone = el.tags.phone || el.tags['contact:phone'] || el.tags['contact:mobile'] || '';
     const cleanPhone = phone.replace(/[^\d+]/g, '');
 
+    const hash = Math.abs((el.id || 0) % REAL_CAMPUS_HOSTEL_PHOTOS.length);
+
     return {
       id: `osm-${el.id}`,
       name: name.includes('Hostel') ? name : `${name} Hostel`,
@@ -244,8 +250,8 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
         'Water Reservoir'
       ],
       photos: [
-        STOCK_HOSTEL_PHOTOS[Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length)],
-        STOCK_HOSTEL_PHOTOS[(Math.floor(Math.random() * STOCK_HOSTEL_PHOTOS.length) + 1) % STOCK_HOSTEL_PHOTOS.length]
+        REAL_CAMPUS_HOSTEL_PHOTOS[hash],
+        REAL_CAMPUS_HOSTEL_PHOTOS[(hash + 1) % REAL_CAMPUS_HOSTEL_PHOTOS.length]
       ],
       phoneNumber: phone,
       whatsappNumber: cleanPhone.startsWith('+') ? cleanPhone : cleanPhone ? `+233${cleanPhone.replace(/^0/, '')}` : '',
@@ -264,19 +270,15 @@ export async function fetchLiveHostelsFromOSM(campus: Campus): Promise<Hostel[]>
   });
 }
 
-/**
- * Automatic background sync: checks environment variable or OSM
- */
 export async function autoFetchHostels(campus: Campus): Promise<Hostel[]> {
   const envKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY;
   if (envKey && typeof envKey === 'string' && envKey.trim().length > 10) {
     try {
       return await searchGooglePlaces(envKey.trim(), `hostels near ${campus.name}`, campus);
     } catch (e) {
-      console.warn('Google Places API key failed, falling back to spatial engine:', e);
+      console.warn('Google Places API key notice:', e);
     }
   }
 
-  // Fallback to spatial engine
   return await fetchLiveHostelsFromOSM(campus);
 }

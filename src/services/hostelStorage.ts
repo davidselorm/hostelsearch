@@ -1,7 +1,7 @@
 import { Hostel, ReviewItem } from '../types/hostel';
 import { INITIAL_HOSTELS } from '../data/seedHostels';
 
-const STORAGE_KEY = 'hostelsearch_hostels_v1';
+const STORAGE_KEY = 'hostelsearch_hostels_v2';
 const BOOKMARKS_KEY = 'hostelsearch_bookmarks_v1';
 const API_KEY_STORAGE = 'hostelsearch_gmaps_api_key';
 

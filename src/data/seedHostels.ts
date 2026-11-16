@@ -54,8 +54,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/7/70/Jubilee_Hall%2C_University_of_Ghana.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/f/f5/University_of_Ghana_-_Legon_Hall_2.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -124,8 +124,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/1/1c/S-Block_%28Legon_hall%29_-_panoramio.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/7/72/Legon_hall_main_entrance_-_panoramio.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -184,8 +184,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/d/da/Akuafo_hall_-Main_-_panoramio.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/e/ea/Akuafo_Hall_annex_c.JPG'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -244,8 +244,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1540518614846-7ede433c4ef8?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/0/07/Entrance_to_Commonwealth_Hall_Legon_1.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/5/53/Side_view_of_Commonwealth_Hall_Legon.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -304,8 +304,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/4/46/CHANCELLOR%27S_HALL_%28GUSSS_HOSTELS%29%2C_KNUST.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/e/ec/Chancellor%E2%80%99s_hall._KNUST.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -364,8 +364,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       '24/7 Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/f/f3/SRC_hostel_-_KNUST.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/c/cf/SRC_hostel_KNUST-Kumasi.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
@@ -423,8 +423,8 @@ export const INITIAL_HOSTELS: Hostel[] = [
       'Security'
     ],
     photos: [
-      'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop&q=80'
+      'https://upload.wikimedia.org/wikipedia/commons/d/df/Gurene_Wikimedia_Community_Meetup%2C_University_of_Cape_Coast_-_18th_September%2C_2021_-_13.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/5/59/Gurene_Wikimedia_Community_Meetup%2C_University_of_Cape_Coast_-_18th_September%2C_2021_-_08.jpg'
     ],
     phoneNumber: '',
     whatsappNumber: '',
